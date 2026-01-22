@@ -40,8 +40,8 @@ Route::prefix('product')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/sinhvien/{name?}/{mssv?}', function (
-    $name = 'Do Dinh Tho',
-    $mssv = '0153567'
+    $name = 'Tran Dinh Chieu',
+    $mssv = '0003067'
 ) {
     return "
         <h2>Thông tin sinh viên</h2>
