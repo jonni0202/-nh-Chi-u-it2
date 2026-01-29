@@ -1,69 +1,39 @@
 <?php
 
+use App\Http\Controllers\ProductController;
+use App\Http\Middleware\CheckTimeAccess;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Home
-|--------------------------------------------------------------------------
-*/
 Route::get('/', function () {
-    return view('home');
+    return view('home.index');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Product group
-|--------------------------------------------------------------------------
-*/
-Route::prefix('product')->group(function () {
-
-    // /product
-    Route::get('/', function () {
-        return view('product.index');
-    })->name('product.index');
-
-    // /product/add
-    Route::get('/add', function () {
-        return view('product.add');
-    })->name('product.add');
-
-    // /product/{id}
-    Route::get('/{id?}', function ($id = '123') {
-        return "Product ID: " . $id;
+// Product
+Route::prefix('product')->middleware(CheckTimeAccess::class)->group(function () {
+    Route::controller(ProductController::class)->group(function () {
+        Route::get('/', 'index')->name('product');
+        Route::get('/add', 'create')->name('add');
+        Route::get('/detail/{id?}', 'getDetail')->name('detail');
+        Route::post('/store', 'store');
+        Route::get('/login', 'login');
+        Route::post('/checkLogin', 'checkLogin');
+        Route::get('/register', 'register');
+        Route::post('/checkRegister', 'checkRegister');
     });
 });
 
-/*
-|--------------------------------------------------------------------------
-| Sinh viên
-|--------------------------------------------------------------------------
-*/
-Route::get('/sinhvien/{name?}/{mssv?}', function (
-    $name = 'Tran Dinh Chieu',
-    $mssv = '0003067'
-) {
-    return "
-        <h2>Thông tin sinh viên</h2>
-        <p>Tên: $name</p>
-        <p>MSSV: $mssv</p>
-    ";
-});
-
-/*
-|--------------------------------------------------------------------------
-| Bàn cờ vua
-|--------------------------------------------------------------------------
-*/
-Route::get('/banco/{n}', function ($n) {
-    return view('banco', compact('n'));
-});
-
-/*
-|--------------------------------------------------------------------------
-| 404
-|--------------------------------------------------------------------------
-*/
+// Page Not Found
 Route::fallback(function () {
-    return response()->view('error.404', [], 404);
+    return View("error.404");
 });
+
+// Sinh viên
+Route::get('/sinhvien/{name?}/{mssv?}', function (?string $name = "Tran Dinh Chieu", ?string $mssv = "0003067") {
+    return view('sinhvien.index', ['name' => $name, 'mssv' => $mssv]);
+});
+
+// Bàn cờ
+Route::get('/banco/{n}', function (int $n) {
+    return view('banco.index', ['n' => $n]);
+});
+
